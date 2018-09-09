@@ -92,12 +92,23 @@
           <executions>
             <execution>
               <id>make-assembly</id>
-              <phase>package</phase>
+              <phase>install</phase>
               <goals><goal>single</goal></goals>
             </execution>
           </executions>
           <version>2.4.1</version>
         </plugin>
+        <!--<plugin>-->
+          <!--<groupId>com.heroku.sdk</groupId>-->
+          <!--<artifactId>heroku-maven-plugin</artifactId>-->
+          <!--<version>2.0.6</version>-->
+          <!--<configuration>-->
+            <!--<appName>data-pool</appName>-->
+            <!--<processTypes>-->
+              <!--<web>java $JAVA_OPTS -cp target/classes:target/dependency/* com.ps.App</web>-->
+            <!--</processTypes>-->
+          <!--</configuration>-->
+        <!--</plugin>-->
         <plugin>
           <artifactId>maven-clean-plugin</artifactId>
           <version>3.0.0</version>
