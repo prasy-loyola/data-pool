@@ -93,6 +93,7 @@ public class DataResource {
         object.addProperty("message", "Data added to data pool. Note: data with multiple field heirarchy is not supported yet.");
         object.addProperty("data", dataAsStringMap.toString());
         return object.toString();
+
     }
 
     @GET
