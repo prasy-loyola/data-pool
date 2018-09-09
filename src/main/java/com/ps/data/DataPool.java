@@ -40,7 +40,7 @@ public class DataPool<T> {
         if (removedData != null) {
             registerData(removedData.getObject());
         }
-        return String.format("{\"releasedData\";\"%s\"}", uuid);
+        return String.format("{\"releasedData\":\"%s\"}", uuid);
     }
 
     private long now() {
