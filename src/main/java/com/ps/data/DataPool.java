@@ -67,7 +67,7 @@ public class DataPool<T> {
 
         //Check that the available data is not already locked
         Stream<T> lockedDataObjectsStream = lockedData.values().stream().map(LockableData::getObject);
-        Optional<T> dataNotIOnLockedDataSet = availableData.filter(t -> !lockedDataObjectsStream.anyMatch(d -> d == t));
+        Optional<T> dataNotIOnLockedDataSet = availableData.filter(t -> !lockedDataObjectsStream.anyMatch(d -> d.equals(t)));
 
 
         if (dataNotIOnLockedDataSet.isPresent()) {

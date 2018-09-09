@@ -1,6 +1,7 @@
 package com.ps.data;
 
 import com.google.gson.Gson;
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.ps.Config;
 import com.ps.utils.ExcelUtils;
@@ -10,6 +11,7 @@ import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Request;
 import java.awt.*;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -81,17 +83,20 @@ public class DataResource {
     @Consumes(MediaType.APPLICATION_JSON)
     public String registerData(String data) {
         Gson gson = new Gson();
-        Map dataAsMap = gson.fromJson(data, Map.class);
-        Map<String, String> dataAsStringMap = new HashMap<>();
-        dataAsMap.forEach((k, v) ->
+        JsonElement element = gson.fromJson(data,JsonElement.class);
+        List<JsonElement> list = new ArrayList<>();
+        if(element.isJsonArray())
         {
-            dataAsStringMap.put(String.valueOf(k), String.valueOf(v));
-        });
+            element.getAsJsonArray().forEach(list::add);
+        } else if (element.isJsonObject()){
+            list.add(element);
+        }
 
-        dataPool.registerData(dataAsStringMap);
+
+        list.forEach(jsonElement -> dataPool.registerData(gson.fromJson(jsonElement,Map.class)));
         JsonObject object = new JsonObject();
         object.addProperty("message", "Data added to data pool. Note: data with multiple field heirarchy is not supported yet.");
-        object.addProperty("data", dataAsStringMap.toString());
+        object.addProperty("data", list.toString());
         return object.toString();
 
     }
