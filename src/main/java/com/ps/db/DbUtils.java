@@ -9,7 +9,7 @@ import java.util.Map;
 
 public class DbUtils {
 
-    private static String CREATE_DATA_TABLE = "CREATE TABLE pooldata (hash varchar(70) NOT NULL UNIQUE, userid varchar(255), data varchar(max))";
+    private static String CREATE_DATA_TABLE = "CREATE TABLE pooldata (hash varchar(70) NOT NULL UNIQUE, userid varchar(255), data varchar(8000))";
     private static String GET_ALL_DATA_FOR_USER = "SELECT * FROM pooldata WHERE userid = '?'";
     private static String DELETE_ALL_DATA_FOR_USER = "DELETE * FROM pooldata WHERE userid = '?'";
     private static String INSERT_DATA_INTO_DB = "INSERT INTO pooldata(hash,userid,data) VALUES ('?', '?','?')";
