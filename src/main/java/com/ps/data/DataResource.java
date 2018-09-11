@@ -109,16 +109,16 @@ public class DataResource {
             list.add(element);
         }
 
-
+        List<JsonElement> successfullyAddedData = new ArrayList<>();
         list.forEach(jsonElement -> getDataPool(getUserId()).registerData(gson.fromJson(jsonElement,Map.class)));
         list.forEach(jsonElement -> {
             boolean addSuccess = DbUtils.addDataToDB(getUserId(),gson.fromJson(jsonElement,Map.class));
-            if(!addSuccess)
-                list.remove(jsonElement);
+            if(addSuccess)
+                successfullyAddedData.add(jsonElement);
         });
         JsonObject object = new JsonObject();
         object.addProperty("message", "Data added to data pool. Note: data with multiple field heirarchy is not supported yet.");
-        object.addProperty("data", list.toString());
+        object.addProperty("data", successfullyAddedData.toString());
         return object.toString();
 
     }
