@@ -54,7 +54,7 @@ public class DataResource {
 
         try {
             return getDataPool(getUserId()).getDataAsResponseJsonString(
-                    hashMapStream -> hashMapStream.filter(hashMapStreamob -> hashMapStreamob.get(Config.DEFAULT_ID_FIELD).trim().equals(roleName))
+                    hashMapStream -> hashMapStream.filter(hashMapStreamob -> String.valueOf(hashMapStreamob.get(Config.DEFAULT_ID_FIELD)).trim().equals(roleName))
                             .findFirst()
             );
         } catch (Exception e) {
@@ -71,7 +71,7 @@ public class DataResource {
         try {
             String finalKey = key;
             return getDataPool(getUserId()).getDataAsResponseJsonString(
-                    hashMapStream -> hashMapStream.filter(hashMapStreamob -> hashMapStreamob.get(finalKey).trim().equals(value.trim()))
+                    hashMapStream -> hashMapStream.filter(hashMapStreamob -> String.valueOf(hashMapStreamob.get(finalKey)).trim().equals(String.valueOf(value).trim()))
                             .findFirst()
             );
         } catch (Exception e) {
