@@ -14,6 +14,7 @@ public class DbUtils {
     private static String DELETE_ALL_DATA_FOR_USER = "DELETE * FROM pooldata WHERE userid = ?";
     private static String INSERT_DATA_INTO_DB = "INSERT INTO pooldata(hash,userid,data) VALUES (?, ?,?)";
     private static String DROP_TABLE = "DROP TABLE IF EXISTS pooldata";
+    private static String COUNT_OF_USER_WITH_ID = "SELECT COUNT(*) FROM pooldata where userid = ?";
     private static Gson gson = new Gson();
 
     public static void createPoolDataTable() {
@@ -63,7 +64,7 @@ public class DbUtils {
 
     }
 
-    public static boolean addUserToDB(String userId, Map<String, String> data) {
+    public static boolean addDataToDB(String userId, Map<String, String> data) {
 
         String dataAsJson = gson.toJson(data);
         Connection connection = DatabaseManager.getInstance().getConnection();
@@ -78,7 +79,8 @@ public class DbUtils {
             return rowsUpdated > 0;
         } catch (SQLException e) {
             e.printStackTrace();
-            throw new RuntimeException("Error in inserting the data for the user " + userId, e);
+//            throw new RuntimeException("Error in inserting the data for the user " + userId, e);
+            return false;
         }
 
     }
@@ -98,7 +100,7 @@ public class DbUtils {
             stmt = connection.prepareStatement(DELETE_ALL_DATA_FOR_USER);
             stmt.setString(1, userId);
             int affectedRows = stmt.executeUpdate();
-            data.forEach(stringStringMap -> addUserToDB(userId, stringStringMap));
+            data.forEach(stringStringMap -> addDataToDB(userId, stringStringMap));
             return true;
 
         } catch (SQLException e) {
@@ -109,4 +111,26 @@ public class DbUtils {
 
 
     }
+
+    public static boolean isAValidUser(String userId){
+
+        if (userId == null || "".equals(userId)) {
+            throw new RuntimeException("User Id cannot be empty or null.");
+        }
+        Connection connection = DatabaseManager.getInstance().getConnection();
+
+        PreparedStatement stmt = null;
+        try {
+            stmt = connection.prepareStatement(COUNT_OF_USER_WITH_ID);
+            stmt.setString(1, userId);
+            ResultSet rs = stmt.executeQuery();
+            while (rs.next()) {
+                return rs.getInt(0) > 0;
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
 }

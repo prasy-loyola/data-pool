@@ -13,7 +13,7 @@ import org.glassfish.jersey.servlet.ServletContainer;
 public class App {
     public static void main(String[] args) {
 
-        DbUtils.createPoolDataTable();
+//        DbUtils.createPoolDataTable();
         ResourceConfig config= new ResourceConfig();
         config.packages("com.ps");
         ServletHolder servletHolder = new ServletHolder(new ServletContainer(config));

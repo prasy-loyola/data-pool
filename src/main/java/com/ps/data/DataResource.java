@@ -5,7 +5,6 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.ps.Config;
 import com.ps.db.DbUtils;
-import com.ps.utils.ExcelUtils;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
@@ -93,6 +92,13 @@ public class DataResource {
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
     public String registerData(String data) {
+
+        if(!DbUtils.isAValidUser(getUserId())){
+            JsonObject response = new JsonObject();
+            response.addProperty("message","Invalid user, cannot register data. Get a FREE user id at the GET /users/newUserId end point");
+            return response.toString();
+        }
+
         Gson gson = new Gson();
         JsonElement element = gson.fromJson(data,JsonElement.class);
         List<JsonElement> list = new ArrayList<>();
@@ -105,7 +111,11 @@ public class DataResource {
 
 
         list.forEach(jsonElement -> getDataPool(getUserId()).registerData(gson.fromJson(jsonElement,Map.class)));
-        list.forEach(jsonElement -> DbUtils.addUserToDB(getUserId(),gson.fromJson(jsonElement,Map.class)));
+        list.forEach(jsonElement -> {
+            boolean addSuccess = DbUtils.addDataToDB(getUserId(),gson.fromJson(jsonElement,Map.class));
+            if(!addSuccess)
+                list.remove(jsonElement);
+        });
         JsonObject object = new JsonObject();
         object.addProperty("message", "Data added to data pool. Note: data with multiple field heirarchy is not supported yet.");
         object.addProperty("data", list.toString());
