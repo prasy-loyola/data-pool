@@ -125,7 +125,7 @@ public class DbUtils {
             stmt.setString(1, userId);
             ResultSet rs = stmt.executeQuery();
             while (rs.next()) {
-                return rs.getInt(0) > 0;
+                return rs.getInt(1) > 0;
             }
         } catch (SQLException e) {
             e.printStackTrace();
