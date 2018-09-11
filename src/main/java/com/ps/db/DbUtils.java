@@ -51,8 +51,6 @@ public class DbUtils {
             while (rs.next()) {
                 Map<String, String> rowData = gson.fromJson(rs.getString("data"), Map.class);
                 neededRows.add(rowData);
-
-                System.out.println("Read from DB: " + rs.getTimestamp("tick"));
             }
 
             return neededRows;
