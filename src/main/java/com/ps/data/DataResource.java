@@ -24,8 +24,8 @@ public class DataResource {
 
     static {
         try {
-            ExcelUtils.getAllData(Config.WORKBOOK_NAME, Config.WORKSHEET_NAME)
-                    .stream().forEach(stringStringMap -> getDataPool("").registerData(stringStringMap));
+//            ExcelUtils.getAllData(Config.WORKBOOK_NAME, Config.WORKSHEET_NAME)
+//                    .stream().forEach(stringStringMap -> getDataPool("").registerData(stringStringMap));
         } catch (Exception ignored) {
             ignored.printStackTrace();
         }
