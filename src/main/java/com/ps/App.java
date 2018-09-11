@@ -1,5 +1,6 @@
 package com.ps;
 
+import com.ps.db.DbUtils;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.servlet.ServletHolder;
@@ -12,6 +13,7 @@ import org.glassfish.jersey.servlet.ServletContainer;
 public class App {
     public static void main(String[] args) {
 
+        DbUtils.createPoolDataTable();
         ResourceConfig config= new ResourceConfig();
         config.packages("com.ps");
         ServletHolder servletHolder = new ServletHolder(new ServletContainer(config));

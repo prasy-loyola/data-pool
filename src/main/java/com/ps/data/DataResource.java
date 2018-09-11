@@ -4,31 +4,42 @@ import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.ps.Config;
+import com.ps.db.DbUtils;
 import com.ps.utils.ExcelUtils;
-import jdk.nashorn.internal.objects.annotations.Getter;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Request;
-import java.awt.*;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
-@Path("data")
+@Path("{userId}/data")
 public class DataResource {
-    private static DataPool<Map<String, String>> dataPool = new DataPool<>(Config.USER_TIMEOUT);
+    private static Map<String,DataPool<Map<String, String>>> dataPools = new HashMap<>();
+
+    @PathParam("userId")
+    private
+    String userId;
 
     static {
         try {
             ExcelUtils.getAllData(Config.WORKBOOK_NAME, Config.WORKSHEET_NAME)
-                    .stream().forEach(stringStringMap -> dataPool.registerData(stringStringMap));
+                    .stream().forEach(stringStringMap -> getDataPool("").registerData(stringStringMap));
         } catch (Exception ignored) {
             ignored.printStackTrace();
         }
     }
+
+    private static DataPool<Map<String, String>> getDataPool(String userId) {
+        if(!dataPools.containsKey(userId)){
+            DataPool<Map<String, String>> dataPool = new DataPool<>(Config.USER_TIMEOUT);
+            DbUtils.getAllDataForUser(userId).forEach(stringStringMap -> dataPool.registerData(stringStringMap));
+            dataPools.put(userId,dataPool);
+        }
+        return dataPools.get(userId);
+    }
+
 
     @GET
     @Path("index")
@@ -43,7 +54,7 @@ public class DataResource {
     public String getDataFromUserDataPool(@QueryParam("role") String roleName) {
 
         try {
-            return dataPool.getDataAsResponseJsonString(
+            return getDataPool(getUserId()).getDataAsResponseJsonString(
                     hashMapStream -> hashMapStream.filter(hashMapStreamob -> hashMapStreamob.get(Config.DEFAULT_ID_FIELD).trim().equals(roleName))
                             .findFirst()
             );
@@ -60,7 +71,7 @@ public class DataResource {
         key = key == null ? Config.DEFAULT_ID_FIELD : key;
         try {
             String finalKey = key;
-            return dataPool.getDataAsResponseJsonString(
+            return getDataPool(getUserId()).getDataAsResponseJsonString(
                     hashMapStream -> hashMapStream.filter(hashMapStreamob -> hashMapStreamob.get(finalKey).trim().equals(value.trim()))
                             .findFirst()
             );
@@ -73,7 +84,7 @@ public class DataResource {
     @Path("{uuid}/release")
     @Produces(MediaType.APPLICATION_JSON)
     public String releaseData(@PathParam("uuid") String uuid) {
-        return dataPool.releaseData(uuid);
+        return getDataPool(getUserId()).releaseData(uuid);
     }
 
 
@@ -93,7 +104,8 @@ public class DataResource {
         }
 
 
-        list.forEach(jsonElement -> dataPool.registerData(gson.fromJson(jsonElement,Map.class)));
+        list.forEach(jsonElement -> getDataPool(getUserId()).registerData(gson.fromJson(jsonElement,Map.class)));
+        list.forEach(jsonElement -> DbUtils.addUserToDB(getUserId(),gson.fromJson(jsonElement,Map.class)));
         JsonObject object = new JsonObject();
         object.addProperty("message", "Data added to data pool. Note: data with multiple field heirarchy is not supported yet.");
         object.addProperty("data", list.toString());
@@ -102,11 +114,17 @@ public class DataResource {
     }
 
     @GET
-    @Path("/releaseAll")
+    @Path("releaseAll")
     @Produces(MediaType.APPLICATION_JSON)
     public String releaseAllData() {
-        return dataPool.releaseAllData();
+        return getDataPool(getUserId()).releaseAllData();
     }
 
+    private String getUserId() {
+        return userId;
+    }
 
+    private void setUserId(String userId) {
+        this.userId = userId;
+    }
 }
