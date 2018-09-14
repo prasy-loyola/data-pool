@@ -34,6 +34,7 @@ public class DatabaseManager {
                     throw new RuntimeException("JDBC_DATABASE_URL environment variable is not set for the postgres db");
                 }
                 connection = DriverManager.getConnection(Config.POSTGRES_DB_CONNECTION_URL);
+                connection.setAutoCommit(true);
             }
             return connection;
         } catch (SQLException e) {
